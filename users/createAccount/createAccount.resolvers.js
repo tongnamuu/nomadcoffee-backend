@@ -1,5 +1,5 @@
-import client from "../client"
 import bcrypt from "bcrypt"
+import client from "../../client";
 
 export default {
   Mutation: {
@@ -29,13 +29,28 @@ export default {
           throw new Error("Account Already Exist!");
         }
         const hashPassword = await bcrypt.hash(password, 10);
-        return client.user.create({
+        const createdUser = await client.user.create({
           data: {
             username, email, name, location, password: hashPassword, avatarURL, githubUsername
           }
         });
+        if(createdUser.id) {
+          return {
+            ok:true
+          }
+        } else {
+          console.log("not created")
+          return {
+            ok: false,
+            error: "Can't Create User"
+          }
+        }
       } catch (error) {
-        return error;
+        console.log("here")
+        return {
+          ok: false,
+          error: "Account Already Exist"
+        }
       }
     }
   }
